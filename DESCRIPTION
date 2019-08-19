@@ -1,0 +1,29 @@
+Package: FindPairs
+Type: Package
+Title: Finding Intercellular Interaction Pairs
+Version: 0.1.1
+Authors@R: person("Huijian", "Feng", email = "feng_huijian@gibh.ac.cn", role = c("aut", "cre"))
+Description: This statistical tool is designed to look for the significant intercellular interaciton pair.
+License: GPL-3 | file LICENSE
+Encoding: UTF-8
+Depends:
+    R (>= 3.4.0),
+    methods,
+Imports: 
+    ggplot2, 
+    dplyr, 
+    doParallel, 
+    parallel, 
+    foreach, 
+    Matrix, 
+    reshape2, 
+    cowplot, 
+    pryr
+Suggests: 
+    Hmisc
+LazyData: true
+RoxygenNote: 6.1.1
+Collate: 
+    'Generics.R'
+    'Objects.R'
+    'Permutate.R'
