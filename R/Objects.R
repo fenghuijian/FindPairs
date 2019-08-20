@@ -41,10 +41,18 @@ FindPairs <- setClass(Class = "FindPairs",
                         IA_Type = "data.frame",
                         # user input parameter
                         P = "list",
-                        # load the data
                         PPI = "data.frame",
-                        # outresult
-                        Output = "list"
+                        # deg for the ident
+                        DEGs = "list",
+                        #output result
+                        # single time point
+                        STP = "list",
+                        # select time-point per cell-cell
+                        PTpCC = "list",
+                        # select cell-cell per time-point
+                        CCpTP = "list",
+                        # enrich result
+                        Enrich = "list"
                       ))
 
 
@@ -90,7 +98,8 @@ Output <- setClass(Class = "Output",
 #' @importFrom methods new
 #'
 #' @param data the normalized data of gene expression
-#' @param meta.data annotation of
+#' @param meta.data annotation of cells. "Cell types" must be annotated. If it is multi-times-point, the times
+#' information should be added to the dataframe.
 #' @param interactive.type The \strong{feature} expressed by \strong{cell types}. The dataframe must contain two variables.
 #' This parameter needs to be set manually, and it must follow the  format below.
 #' \itemize{
@@ -99,29 +108,35 @@ Output <- setClass(Class = "Output",
 #'   \strong{"SYMBOLA"} means this gene feature is "SYMBOLA" feature and \strong{"SYMBOLB"} means this gene feature is
 #'   "SYMBOLB" feature.
 #' }
-#' @param ident input the cells day
+#' @param ident Determine whether the input data contains multi-times information. There are two arguments, mtp:
+#' multi-times-point or stp: single-time-point.
 #' @export
 #'
 BuildFP <- function(data,
                     meta.data,
                     interactive.type,
-                    ident){
-  options(stringsAsFactors = F)
-  # filter data
-  filter.data <- data[rownames(data) %in% c(ppidb$symbol_a, ppidb$symbol_b), ]
-  assays <- new(Class = "Assays",
-                RNData = data,
-                FNData = filter.data)
-  # metadata
-  meta.data$index <- paste0(meta.data[, 1], "/", meta.data[, 2])
-  # parmeter
-  ob <- new(Class = "FindPairs",
-            Assays = list(NData = assays),
-            MData = meta.data,
-            P = list(Ident = ident),
-            IA_Type = interactive.type,
-            PPI = ppidb
-  )
+                    ident = c("mtp", "stp")){
+  if(length(ident) > 1) {
+    stop("Please determine a attribute")
+  }
+  else if(ident %in% c("mtp", "stp") == FALSE) {
+    stop("Please enter a valid attribute")
+  }
+  else{
+    # filter data
+    filter.data <- data[rownames(data) %in% c(ppidb$symbol_a, ppidb$symbol_b), ]
+    assays <- new(Class = "Assays",
+                  RNData = data,
+                  FNData = filter.data)
+    # parmeter
+    ob <- new(Class = "FindPairs",
+              Assays = list(NData = assays),
+              MData = meta.data,
+              P = list(Ident = ident),
+              IA_Type = interactive.type,
+              PPI = ppidb)
+    return(ob)
+  }
 }
 
 
