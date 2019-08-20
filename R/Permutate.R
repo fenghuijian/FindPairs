@@ -49,16 +49,16 @@ Calculate_score.FindPairs <- function(object, metric = c("mean", "ratio"), ...) 
           stop("Please enter a valid measurement method")
         }
         if(metric == "mean"){
-          symA_mean <- rowMeans(symA)
-          symB_mean <- rowMeans(symB)
+          symA_mean <- rowMeans(as.matrix(symA))
+          symB_mean <- rowMeans(as.matrix(symB))
           score <- exp(symA_mean[object@PPI$symbol_a] + symB_mean[object@PPI$symbol_b])
           names(score) <- object@PPI$symbol_ab
           score <- na.omit(score)
         }
         if(metric == "ratio"){
-          symA_ratio <- rowSums(symA > 0) / ncol(symA)
-          symB_ratio <- rowSums(symB > 0) / ncol(symB)
-          score <- exp(symA_ratio[object@PPI$symbol_a] + symA_ratio[object@PPI$symbol_b])
+          symA_ratio <- rowSums(as.matrix(symA) > 0) / ncol(symA)
+          symB_ratio <- rowSums(as.matrix(symB) > 0) / ncol(symB)
+          score <- exp(symA_ratio[object@PPI$symbol_a] + symB_ratio[object@PPI$symbol_b])
           names(score) <- object@PPI$symbol_ab
           score <- na.omit(score)
         }
@@ -113,14 +113,14 @@ permutate_test.FindPairs <- function(object, number, i, Asample_size, Bsample_si
     symA_s <- object@Assays$NData@FNData[, sample(which(object@MData[, 1] == symAcell), Asample_size)]
     symB_s <- object@Assays$NData@FNData[, sample(which(object@MData[, 1] == symBcell), Bsample_size)]
     if(object@P$metric == "ratio") {
-      symA_sratio <- rowSums(symA_s > 0) / ncol(symA_s)
-      symB_sratio <- rowSums(symB_s > 0) / ncol(symB_s)
+      symA_sratio <- rowSums(as.matrix(symA_s) > 0) / ncol(symA_s)
+      symB_sratio <- rowSums(as.matrix(symB_s) > 0) / ncol(symB_s)
       score <- exp(symA_sratio[object@PPI$symbol_a] + symB_sratio[object@PPI$symbol_b])
     }
     if(object@P$metric == "mean") {
-      symA_sratio <- mean(symA_s)
-      symB_sratio <- mean(symB_s)
-      score <- exp(symA_sratio[object@PPI$symbol_a] + symB_sratio[object@PPI$symbol_b])
+      symA_smean <- rowMeans(as.matrix(symA_s))
+      symB_smean <- rowMeans(as.matrix(symB_s))
+      score <- exp(symA_smean[object@PPI$symbol_a] + symB_smean[object@PPI$symbol_b])
     }
     exp_dis <- add.col.self(dataframe = exp_dis, new.vector = score)
   }
