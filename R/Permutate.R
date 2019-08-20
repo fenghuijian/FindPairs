@@ -51,16 +51,19 @@ Calculate_score.FindPairs <- function(object, metric = c("mean", "ratio"), ...) 
         if(metric == "mean"){
           symA_mean <- rowMeans(symA)
           symB_mean <- rowMeans(symB)
-          score <- exp(symA_mean[object@PPI$SYMBOL_A] + symB_mean[object@PPI$SYMBOL_B])
-          names(score) <- object@PPI$SYMBOL_AB
+          score <- exp(symA_mean[object@PPI$symbol_a] + symB_mean[object@PPI$symbol_b])
+          names(score) <- object@PPI$symbol_ab
+          score <- na.omit(score)
         }
         if(metric == "ratio"){
           symA_ratio <- rowSums(symA > 0) / ncol(symA)
           symB_ratio <- rowSums(symB > 0) / ncol(symB)
-          score <- exp(symA_ratio[object@PPI$SYMBOL_A] + symA_ratio[object@PPI$SYMBOL_B])
-          names(score) <- object@PPI$SYMBOL_AB
+          score <- exp(symA_ratio[object@PPI$symbol_a] + symA_ratio[object@PPI$symbol_b])
+          names(score) <- object@PPI$symbol_ab
+          score <- na.omit(score)
         }
         data_time <- add.col.self(dataframe = data_time, new.vector = score)
+
       }
       colnames(data_time) <- object@P[["Ident"]]
       data_time <- na.omit(data_time)
@@ -112,16 +115,16 @@ permutate_test.FindPairs <- function(object, number, i, Asample_size, Bsample_si
     if(object@P$metric == "ratio") {
       symA_sratio <- rowSums(symA_s > 0) / ncol(symA_s)
       symB_sratio <- rowSums(symB_s > 0) / ncol(symB_s)
-      score <- exp(symA_sratio[object@PPI$SYMBOL_A] + symB_sratio[object@PPI$SYMBOL_B])
+      score <- exp(symA_sratio[object@PPI$symbol_a] + symB_sratio[object@PPI$symbol_b])
     }
     if(object@P$metric == "mean") {
       symA_sratio <- mean(symA_s)
       symB_sratio <- mean(symB_s)
-      score <- exp(symA_sratio[object@PPI$SYMBOL_A] + symB_sratio[object@PPI$SYMBOL_B])
+      score <- exp(symA_sratio[object@PPI$symbol_a] + symB_sratio[object@PPI$symbol_b])
     }
     exp_dis <- add.col.self(dataframe = exp_dis, new.vector = score)
   }
-  rownames(exp_dis) <- object@PPI$SYMBOL_AB
+  rownames(exp_dis) <- object@PPI$symbol_ab
   exp_dis <- na.omit(exp_dis)
   # pvalue
   pvl_one <- apply(object@Output[[i]]@output.strength, 2, function(x){
