@@ -4,12 +4,13 @@
 \alias{BuildFP}
 \title{Setup the FindPairs object}
 \usage{
-BuildFP(data, meta.data, interactive.type, ident)
+BuildFP(data, meta.data, interactive.type, ident = c("mtp", "stp"))
 }
 \arguments{
 \item{data}{the normalized data of gene expression}
 
-\item{meta.data}{annotation of}
+\item{meta.data}{annotation of cells. "Cell types" must be annotated. If it is multi-times-point, the times
+information should be added to the dataframe.}
 
 \item{interactive.type}{The \strong{feature} expressed by \strong{cell types}. The dataframe must contain two variables.
 This parameter needs to be set manually, and it must follow the  format below.
@@ -20,7 +21,8 @@ This parameter needs to be set manually, and it must follow the  format below.
   "SYMBOLB" feature.
 }}
 
-\item{ident}{input the cells day}
+\item{ident}{Determine whether the input data contains multi-times information. There are two arguments, mtp:
+multi-times-point or stp: single-time-point.}
 }
 \description{
 Setup the FindPairs object

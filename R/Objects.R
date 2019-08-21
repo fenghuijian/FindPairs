@@ -48,7 +48,7 @@ FindPairs <- setClass(Class = "FindPairs",
                         # single time point
                         STP = "list",
                         # select time-point per cell-cell
-                        PTpCC = "list",
+                        TPpCC = "list",
                         # select cell-cell per time-point
                         CCpTP = "list",
                         # enrich result

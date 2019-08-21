@@ -12,7 +12,7 @@ NULL
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 # calculate the cell-cell interaciton
-calculate_score <- function(object, ident, symA_no, symB_no, times, ...){
+calculate_score <- function(object, ident, metric, symA_no, symB_no, times = NULL, ...){
   if(is.null(ident) | !ident %in% c("stp", "mtp")){
     stop("Peasle input the ident of data")
   }
@@ -69,31 +69,18 @@ Calculate_score.FindPairs <- function(object, metric = c("mean", "ratio"), targe
   symA_sum <- object@IA_Type[object@IA_Type[, 2] == "SYMBOLA", ][, 1]
   symB_sum <- object@IA_Type[object@IA_Type[, 2] == "SYMBOLB", ][, 1]
   Statistics <- list()
-  object@P[["Target"]] <- c()
+  if(is.null(object@P[["Target"]])) {
+    object@P[["Target"]] <- c()
+  }else{
+    object@P[["Target"]] <- object@P[["Target"]]
+  }
   # single time point intercellular interaction
   if(object@P[["Ident"]] == "stp") {
     data_stp <- data.frame()
     for(symB_no in symA_sum) {
       for(symA_no in symA_sum) {
-        symA <- object@Assays$NData@FNData[, which(object@MData[, 1] == symA_no)]
-        symB <- object@Assays$NData@FNData[, which(object@MData[, 1] == symB_no)]
-        if(length(metric) > 1){
-          stop("Please determine a measurement method")
-        }
-        if(metric == "mean"){
-          symA_mean <- rowMeans(as.matrix(symA))
-          symB_mean <- rowMeans(as.matrix(symB))
-          score <- exp(symA_mean[object@PPI$symbol_a] + symB_mean[object@PPI$symbol_b])
-          names(score) <- object@PPI$symbol_ab
-          score <- na.omit(score)
-        }
-        if(metric == "ratio"){
-          symA_ratio <- rowSums(as.matrix(symA) > 0) / ncol(symA)
-          symB_ratio <- rowSums(as.matrix(symB) > 0) / ncol(symB)
-          score <- exp(symA_ratio[object@PPI$symbol_a] + symB_ratio[object@PPI$symbol_b])
-          names(score) <- object@PPI$symbol_ab
-          score <- na.omit(score)
-        }
+        score <- calculate_score(object = object, ident = object@P[["Ident"]], metric = metric,
+                                 symA_no = symA_no, symB_no = symB_no)
         col_stp <- paste0(symA_no, "/", symB_no)
         data_stp <- add.col.self(dataframe = data_stp, new.vector = score)
         colnames(data_stp)[ncol(data_stp)] <- col_stp
@@ -103,7 +90,7 @@ Calculate_score.FindPairs <- function(object, metric = c("mean", "ratio"), targe
     output <- new(Class = "Output",
                   output.strength = as.matrix(data.frame(data_stp)))
     Statistics["stp"] <- list(output)
-    object@P[["Target"]] <- append(bject@P[["Target"]], "single time point")
+    object@P[["Target"]] <- append(object@P[["Target"]], "single time point")
     object@STP <- Statistics
   }
   # multi-times point intercellular interaction
@@ -120,26 +107,9 @@ Calculate_score.FindPairs <- function(object, metric = c("mean", "ratio"), targe
       for(symB_no in symB_sum) {
         for(symA_no in symA_sum) {
           data_tppcc <- data.frame()
-          for(times in time_point) {
-            symA <- object@Assays$NData@FNData[, which(object@MData[, 3] == paste0(symA_no, "/", times))]
-            symB <- object@Assays$NData@FNData[, which(object@MData[, 3] == paste0(symB_no, "/", times))]
-            if(length(metric) > 1){
-              stop("Please determine a measurement method")
-            }
-            if(metric == "mean"){
-              symA_mean <- rowMeans(as.matrix(symA))
-              symB_mean <- rowMeans(as.matrix(symB))
-              score <- exp(symA_mean[object@PPI$symbol_a] + symB_mean[object@PPI$symbol_b])
-              names(score) <- object@PPI$symbol_ab
-              score <- na.omit(score)
-            }
-            if(metric == "ratio"){
-              symA_ratio <- rowSums(as.matrix(symA) > 0) / ncol(symA)
-              symB_ratio <- rowSums(as.matrix(symB) > 0) / ncol(symB)
-              score <- exp(symA_ratio[object@PPI$symbol_a] + symB_ratio[object@PPI$symbol_b])
-              names(score) <- object@PPI$symbol_ab
-              score <- na.omit(score)
-            }
+          for(tp in time_point) {
+            score <- calculate_score(object = object, ident = object@P[["Ident"]], metric = metric,
+                                     symA_no = symA_no, symB_no = symB_no, times = tp)
             data_tppcc <- add.col.self(dataframe = data_tppcc, new.vector = score)
           }
           colnames(data_tppcc) <- object@P[["Time_points"]]
@@ -159,25 +129,8 @@ Calculate_score.FindPairs <- function(object, metric = c("mean", "ratio"), targe
         data_ccptp <- data.frame()
         for(symB_no in symB_sum){
           for(symA_no in symA_sum){
-            symA <- object@Assays$NData@FNData[, which(object@MData[, 3] == paste0(symA_no, "/", tp))]
-            symB <- object@Assays$NData@FNData[, which(object@MData[, 3] == paste0(symB_no, "/", tp))]
-            if(length(metric) > 1){
-              stop("Please determine a measurement method")
-            }
-            if(metric == "mean"){
-              symA_mean <- rowMeans(as.matrix(symA))
-              symB_mean <- rowMeans(as.matrix(symB))
-              score <- exp(symA_mean[object@PPI$symbol_a] + symB_mean[object@PPI$symbol_b])
-              names(score) <- object@PPI$symbol_ab
-              score <- na.omit(score)
-            }
-            if(metric == "ratio"){
-              symA_ratio <- rowSums(as.matrix(symA) > 0) / ncol(symA)
-              symB_ratio <- rowSums(as.matrix(symB) > 0) / ncol(symB)
-              score <- exp(symA_ratio[object@PPI$symbol_a] + symB_ratio[object@PPI$symbol_b])
-              names(score) <- object@PPI$symbol_ab
-              score <- na.omit(score)
-            }
+            score <- calculate_score(object = object, ident = object@P[["Ident"]], metric = metric,
+                                     symA_no = symA_no, symB_no = symB_no, times = tp)
             data_ccptp <- add.col.self(dataframe = data_ccptp, new.vector = score)
             colnames(data_ccptp)[ncol(data_ccptp)] <- paste0(symA_no, "/", symB_no)
           }

@@ -11,7 +11,7 @@ Calculate_score(object, ...)
 \method{Calculate_score}{default}(object, ...)
 
 \method{Calculate_score}{FindPairs}(object, metric = c("mean", "ratio"),
-  ...)
+  target = NULL, ...)
 }
 \arguments{
 \item{object}{An object}
@@ -23,6 +23,12 @@ Calculate_score(object, ...)
   \item ratio: The percentage of cells with gene expression > 0
   \item mean: The mean of gene expression
 }}
+
+\item{target}{If this is the "stp" data, the "target" agrument is not considered. Calling this function will
+directly calculate the intercellular interaciton. If this is the "mtp" data, the "target" has two potential
+parameters. 1. "CCpTP", \strong{cell-cell per time point}: this calculate the interaciton of different cell types at
+time poit. 2. "TPpCC", \strong{time point per cell-cell}: this calculate the cell-cell interaction of different time points
+for each cell-cell interaciton.}
 }
 \value{
 Returns FindPairs object with the score calculation stored in the Output slot
