@@ -12,9 +12,9 @@ FP_test(object, ...)
 \method{FP_test}{default}(object, ...)
 
 \method{FP_test}{FindPairs}(object, Asample_size = 3000,
-  Bsample_size = 3000, fdr = 0.01, fdr_method = "BH",
-  permutation_number = 5000, dopar = FALSE, dopar.numbers = 2,
-  random.seed = 42)
+  Bsample_size = 3000, target = c("STP", "CCpTP", "TPpCC"),
+  fdr = 0.01, fdr_method = "BH", permutation_number = 5000,
+  dopar = FALSE, dopar.numbers = 2, random.seed = 42, ...)
 }
 \arguments{
 \item{object}{An object}
@@ -28,6 +28,13 @@ parameter. This paramterhave two funcitons: one is to provide a fixed background
 reduce the impact of low number cells in the permutation.}
 
 \item{Bsample_size}{Permutating the number of cell expressing symbol B. Default 200'}
+
+\item{target}{This agrument is corresponding to the agrument \code{target} of function \code{Calculate_score}.If
+the data is "stp", setting \code{target = "STP"}, this will do the permutation test under this condition. If
+this is the "mtp" data, the "target" has two potential parameters. 1. "CCpTP", \strong{cell-cell per time point}:
+this will do the permutation test for the interaciton of different cell types at time poit. 2. "TPpCC",
+\strong{time point per cell-cell}: this will do the permutation test for the cell-cell interaction of different
+time points for each cell-cell interaciton.}
 
 \item{fdr}{Filter for significant pvalue. Default 0.01}
 

@@ -26,8 +26,12 @@ setClassUnion(name = "AnyMatrix",
 #' @slot MData Contains meta-information about each cells
 #' @slot IA_Type User-defined intercellular interaction need to be calculated
 #' @slot P User-defined parameters
-#' @slot PPi Curated Protein-Protein Interaciton Database
-#' @slot Output A list of Output of this project
+#' @slot PPI Curated Protein-Protein Interaciton Database
+#' @slot DEGs A list of output of this differentially expressed genes
+#' @slot STP A list of output of the "single time point" data
+#' @slot TPpCC A list of output of the target: "time-point per cell-cell interaction" of "multi-time points" data
+#' @slot CCpTP A list of output of the target: "cell-cell interaction per time-point" of "multi-time points" data
+#' @slot Enrich A list of output of the enrcihment
 #'
 #' @name FindPairs-class
 #' @rdname FindPairs-class

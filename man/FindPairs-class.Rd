@@ -20,8 +20,16 @@ This Clsss is set to better calculate the intercellular intercation.
 
 \item{\code{P}}{User-defined parameters}
 
-\item{\code{PPi}}{Curated Protein-Protein Interaciton Database}
+\item{\code{PPI}}{Curated Protein-Protein Interaciton Database}
 
-\item{\code{Output}}{A list of Output of this project}
+\item{\code{DEGs}}{A list of output of this differentially expressed genes}
+
+\item{\code{STP}}{A list of output of the "single time point" data}
+
+\item{\code{TPpCC}}{A list of output of the target: "time-point per cell-cell interaction" of "multi-time points" data}
+
+\item{\code{CCpTP}}{A list of output of the target: "cell-cell interaction per time-point" of "multi-time points" data}
+
+\item{\code{Enrich}}{A list of output of the enrcihment}
 }}
 

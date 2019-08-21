@@ -97,18 +97,49 @@ Calculate_score <- function(object, ...) {
 }
 
 
-#' Permutate Test
+#' Time-Point per Cell-Cell interaction Permutate Test
 #'
-#' Permutate Test for one intercellular interaction
+#' Permutate Test for different time point of one Cell-Cell interaction
 #'
 #' @param object An object
 #' @param ... Arguments passed to other methods
 #'
-#' @rdname permutate_test
-#' @export permutate_test
+#' @rdname tppcc_ptest
+#' @export tppcc_ptest
 #'
-permutate_test <- function(object, ...) {
-  UseMethod(generic = "permutate_test", object = object)
+tppcc_ptest <- function(object, ...) {
+  UseMethod(generic = "tppcc_ptest", object = object)
+}
+
+
+
+#' Cell-Cell interaction per Time-Point Permutate Test
+#'
+#' Permutate Test for different cell-cell interaction of one time point
+#'
+#' @param object An object
+#' @param ... Arguments passed to other methods
+#'
+#' @rdname ccptp_ptest
+#' @export ccptp_ptest
+#'
+ccptp_ptest <- function(object, ...) {
+  UseMethod(generic = "ccptp_ptest", object = object)
+}
+
+
+#' Cell-Cell interaction Permutate Test
+#'
+#' Permutate Test for different cell-cell interaction without time-point
+#'
+#' @param object An object
+#' @param ... Arguments passed to other methods
+#'
+#' @rdname stp_ptest
+#' @export stp_ptest
+#'
+stp_ptest <- function(object, ...) {
+  UseMethod(generic = "stp_ptest", object = object)
 }
 
 
