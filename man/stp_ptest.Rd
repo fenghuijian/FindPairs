@@ -2,12 +2,13 @@
 % Please edit documentation in R/Generics.R, R/Permutate.R
 \name{stp_ptest}
 \alias{stp_ptest}
+\alias{stp_ptest.default}
 \alias{stp_ptest.FindPairs}
 \title{Cell-Cell interaction Permutate Test}
 \usage{
 stp_ptest(object, ...)
 
-stp_ptest(object, ...)
+\method{stp_ptest}{default}(object, ...)
 
 \method{stp_ptest}{FindPairs}(object, number, Asample_size, Bsample_size,
   seed, ...)

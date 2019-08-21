@@ -27,14 +27,14 @@ calculate_score <- function(object, ident, metric, symA_no, symB_no, times = NUL
   if(metric == "mean"){
     symA_mean <- rowMeans(as.matrix(symA))
     symB_mean <- rowMeans(as.matrix(symB))
-    score <- exp(symA_mean[object@PPI$symbol_a] + symB_mean[object@PPI$symbol_b])
+    score <- exp(symA_mean[object@PPI$symbol_a] * symB_mean[object@PPI$symbol_b])
     names(score) <- object@PPI$symbol_ab
     score <- na.omit(score)
   }
   if(metric == "ratio"){
     symA_ratio <- rowSums(as.matrix(symA) > 0) / ncol(symA)
     symB_ratio <- rowSums(as.matrix(symB) > 0) / ncol(symB)
-    score <- exp(symA_ratio[object@PPI$symbol_a] + symB_ratio[object@PPI$symbol_b])
+    score <- exp(symA_ratio[object@PPI$symbol_a] * symB_ratio[object@PPI$symbol_b])
     names(score) <- object@PPI$symbol_ab
     score <- na.omit(score)
   }
@@ -77,7 +77,7 @@ Calculate_score.FindPairs <- function(object, metric = c("mean", "ratio"), targe
   # single time point intercellular interaction
   if(object@P[["Ident"]] == "stp") {
     data_stp <- data.frame()
-    for(symB_no in symA_sum) {
+    for(symB_no in symB_sum) {
       for(symA_no in symA_sum) {
         score <- calculate_score(object = object, ident = object@P[["Ident"]], metric = metric,
                                  symA_no = symA_no, symB_no = symB_no)
@@ -87,9 +87,10 @@ Calculate_score.FindPairs <- function(object, metric = c("mean", "ratio"), targe
       }
     }
     data_stp <- na.omit(data_stp)
+    data_stp <- as.matrix(data.frame(data_stp))
     colnames(data_stp) <- gsub("\\.", "/", colnames(data_stp))
     output <- new(Class = "Output",
-                  output.strength = as.matrix(data.frame(data_stp)))
+                  output.strength = data_stp)
     Statistics["stp"] <- list(output)
     object@P[["Target"]] <- append(object@P[["Target"]], "single time point")
     object@STP <- Statistics
@@ -115,8 +116,9 @@ Calculate_score.FindPairs <- function(object, metric = c("mean", "ratio"), targe
           }
           colnames(data_tppcc) <- object@P[["Time_points"]]
           data_tppcc <- na.omit(data_tppcc)
+          data_tppcc <- as.matrix(data.frame(data_tppcc))
           output <- new(Class = "Output",
-                        output.strength = as.matrix(data.frame(data_tppcc)))
+                        output.strength = data_tppcc)
           nom <- paste0(symA_no, "/", symB_no)
           Statistics[nom] <- list(output)
         }
@@ -136,10 +138,11 @@ Calculate_score.FindPairs <- function(object, metric = c("mean", "ratio"), targe
             colnames(data_ccptp)[ncol(data_ccptp)] <- paste0(symA_no, "/", symB_no)
           }
         }
-        colnames(data_ccptp) <- gsub("\\.", "/", colnames(data_ccptp))
         data_ccptp <- na.omit(data_ccptp)
+        data_ccptp <- as.matrix(data.frame(data_ccptp))
+        colnames(data_ccptp) <- gsub("\\.", "/", colnames(data_ccptp))
         output <- new(Class = "Output",
-                      output.strength = as.matrix(data.frame(data_ccptp)))
+                      output.strength = data_ccptp)
         Statistics[tp] <- list(output)
       }
       object@CCpTP <- Statistics
@@ -188,12 +191,12 @@ tppcc_ptest.FindPairs <- function(object, number, i, Asample_size, Bsample_size,
     if(object@P$metric == "ratio") {
       symA_sratio <- rowSums(as.matrix(symA_s) > 0) / ncol(symA_s)
       symB_sratio <- rowSums(as.matrix(symB_s) > 0) / ncol(symB_s)
-      score <- exp(symA_sratio[object@PPI$symbol_a] + symB_sratio[object@PPI$symbol_b])
+      score <- exp(symA_sratio[object@PPI$symbol_a] * symB_sratio[object@PPI$symbol_b])
     }
     if(object@P$metric == "mean") {
       symA_smean <- rowMeans(as.matrix(symA_s))
       symB_smean <- rowMeans(as.matrix(symB_s))
-      score <- exp(symA_smean[object@PPI$symbol_a] + symB_smean[object@PPI$symbol_b])
+      score <- exp(symA_smean[object@PPI$symbol_a] * symB_smean[object@PPI$symbol_b])
     }
     exp_dis <- add.col.self(dataframe = exp_dis, new.vector = score)
   }
@@ -242,12 +245,12 @@ ccptp_ptest.FindPairs <- function(object, number, i, Asample_size, Bsample_size,
     if(object@P$metric == "ratio") {
       symA_sratio <- rowSums(as.matrix(symA_s) > 0) / ncol(symA_s)
       symB_sratio <- rowSums(as.matrix(symB_s) > 0) / ncol(symB_s)
-      score <- exp(symA_sratio[object@PPI$symbol_a] + symB_sratio[object@PPI$symbol_b])
+      score <- exp(symA_sratio[object@PPI$symbol_a] * symB_sratio[object@PPI$symbol_b])
     }
     if(object@P$metric == "mean") {
       symA_smean <- rowMeans(as.matrix(symA_s))
       symB_smean <- rowMeans(as.matrix(symB_s))
-      score <- exp(symA_smean[object@PPI$symbol_a] + symB_smean[object@PPI$symbol_b])
+      score <- exp(symA_smean[object@PPI$symbol_a] * symB_smean[object@PPI$symbol_b])
     }
     exp_dis <- add.col.self(dataframe = exp_dis, new.vector = score)
   }
@@ -258,7 +261,7 @@ ccptp_ptest.FindPairs <- function(object, number, i, Asample_size, Bsample_size,
     u <- (x - mean(exp_dis))/sd(exp_dis)
     pvl <- 1 - pnorm(q = u, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
   })
-  colnames(pvl_one) <- colnames(object@CCpTP[[i]]@out.strength)
+  colnames(pvl_one) <- colnames(object@CCpTP[[i]]@output.strength)
   return(pvl_one)
 }
 
@@ -267,7 +270,7 @@ ccptp_ptest.FindPairs <- function(object, number, i, Asample_size, Bsample_size,
 #' @rdname stp_ptest
 #' @export
 #'
-stp_ptest <- function(object, ...){
+stp_ptest.default <- function(object, ...){
   print("You screwed up. I do not know how to handle the this object")
 }
 
@@ -295,12 +298,12 @@ stp_ptest.FindPairs <- function(object, number, Asample_size, Bsample_size, seed
     if(object@P$metric == "ratio") {
       symA_sratio <- rowSums(as.matrix(symA_s) > 0) / ncol(symA_s)
       symB_sratio <- rowSums(as.matrix(symB_s) > 0) / ncol(symB_s)
-      score <- exp(symA_sratio[object@PPI$symbol_a] + symB_sratio[object@PPI$symbol_b])
+      score <- exp(symA_sratio[object@PPI$symbol_a] * symB_sratio[object@PPI$symbol_b])
     }
     if(object@P$metric == "mean") {
       symA_smean <- rowMeans(as.matrix(symA_s))
       symB_smean <- rowMeans(as.matrix(symB_s))
-      score <- exp(symA_smean[object@PPI$symbol_a] + symB_smean[object@PPI$symbol_b])
+      score <- exp(symA_smean[object@PPI$symbol_a] * symB_smean[object@PPI$symbol_b])
     }
     exp_dis <- add.col.self(dataframe = exp_dis, new.vector = score)
   }
@@ -369,8 +372,9 @@ FP_test.FindPairs <- function(
   ...
   ){
   if(target == "STP"){
-    pvl_list <- stp_ptest(object = object, number = permutation_number)
-    object@STP$stp@out.pvalue <- pvl_list
+    pvl_list <- stp_ptest(object = object, number = permutation_number, Asample_size = Asample_size,
+                          Bsample_size = Bsample_size, seed = random.seed)
+    object@STP$stp@output.pvalue <- pvl_list
   }
   else if(target == "TPpCC") {
     if(dopar == TRUE) {
@@ -379,7 +383,7 @@ FP_test.FindPairs <- function(
       pvl_list <- foreach(name = names(object@TPpCC),
                           .export = c("tppcc_ptest", "tppcc_ptest.default", "tppcc_ptest.FindPairs", "add.col.self"),
                           .packages = c("Matrix")) %dopar% {
-                            pvl_one <- tppcc_ptest(oject = object,
+                            pvl_one <- tppcc_ptest(object = object,
                                                    number = permutation_number,
                                                    i = name,
                                                    seed = random.seed,
@@ -392,7 +396,7 @@ FP_test.FindPairs <- function(
     else{
       pvl_list <- list()
       for(name in names(object@TPpCC)){
-        pvl_one <- tppcc_ptest(oject = object,
+        pvl_one <- tppcc_ptest(object = object,
                                number = permutation_number,
                                i = name,
                                seed = random.seed,
@@ -402,7 +406,7 @@ FP_test.FindPairs <- function(
       }
     }
     for(p in names(pvl_list)) {
-      object@TPpCC[[p]]@out.pvalue <- pvl_list[[p]]
+      object@TPpCC[[p]]@output.pvalue <- pvl_list[[p]]
     }
   }
   else if(target == "CCpTP") {
@@ -412,7 +416,7 @@ FP_test.FindPairs <- function(
       pvl_list <- foreach(tp = names(object@CCpTP),
                           .export = c("ccptp_ptest", "ccptp_ptest.default", "ccptp_ptest.FindPairs", "add.col.self"),
                           .packages = c("Matrix")) %dopar% {
-                            pvl_one <- ccptp_ptest(oject = object,
+                            pvl_one <- ccptp_ptest(object = object,
                                                    number = permutation_number,
                                                    i = day,
                                                    seed = random.seed,
@@ -425,7 +429,7 @@ FP_test.FindPairs <- function(
     else{
       pvl_list <- list()
       for(day in names(object@CCpTP)) {
-        pvl_one <- ccptp_ptest(oject = object,
+        pvl_one <- ccptp_ptest(object = object,
                                number = permutation_number,
                                i = day,
                                seed = random.seed,
@@ -435,7 +439,7 @@ FP_test.FindPairs <- function(
       }
     }
     for(p in names(pvl_list)) {
-      object@CCpTP[[p]]@out.pvalue <- pvl_list[[p]]
+      object@CCpTP[[p]]@output.pvalue <- pvl_list[[p]]
     }
   }
   else{stop("Pealse input a valid target")}
@@ -466,5 +470,4 @@ add.col.self <- function(dataframe, new.vector) {
 #   Test Package:              'Ctrl + Shift + T'
 
 # plot the heatmap
-
 
